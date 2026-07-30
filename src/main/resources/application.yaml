@@ -3,9 +3,9 @@ spring:
     name: logisctic-platform
 
   datasource:
-    url: jdbc:postgresql://192.168.56.101:5432/logisticsystem
-    username: admin
-    password: admin
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
