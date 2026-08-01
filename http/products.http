@@ -1,0 +1,32 @@
+### Получить все товары
+GET http://localhost:8080/api/products
+
+###
+
+### Получить товар по ID
+GET http://localhost:8080/api/products/1
+
+###
+
+### Создать товар
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "iPhone 15",
+  "description": "Apple smartphone",
+  "photoUrl": "https://example.com/iphone.jpg",
+  "price": 999.99,
+  "dimensions": {
+    "length": 14.7,
+    "width": 7.1,
+    "height": 0.8
+  },
+  "categoryId": 1,
+  "supplierId": 2
+}
+
+###
+
+### Удалить товар
+DELETE http://localhost:8080/api/products/1
