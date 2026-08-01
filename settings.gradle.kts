@@ -1,1 +1,1 @@
-rootProject.name = "logisctic-platform"
+rootProject.name = "logistic-platform"

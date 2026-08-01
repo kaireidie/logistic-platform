@@ -1,10 +1,10 @@
-package org.example.logiscticplatform;
+package org.example.logisticplatform;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class LogiscticPlatformApplicationTests {
+class LogisticPlatformApplicationTests {
 
     @Test
     void contextLoads() {

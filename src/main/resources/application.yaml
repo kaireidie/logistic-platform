@@ -1,6 +1,6 @@
 spring:
   application:
-    name: logisctic-platform
+    name: logistic-platform
 
   datasource:
     url: ${DB_URL}

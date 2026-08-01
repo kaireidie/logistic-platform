@@ -1,4 +1,4 @@
-package org.example.logiscticplatform.product;
+package org.example.logisticplatform.product;
 
 import org.springframework.web.bind.annotation.*;
 
