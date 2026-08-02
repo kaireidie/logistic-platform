@@ -1,4 +1,5 @@
 package org.example.logisticplatform.product;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
@@ -11,12 +12,13 @@ import java.math.BigDecimal;
 @Embeddable
 public class Dimensions {
     @Column(name = "length", nullable = false)
-    private BigDecimal  length;
+    private BigDecimal length;
     @Column(name = "width", nullable = false)
-    private BigDecimal  width;
+    private BigDecimal width;
     @Column(name = "height", nullable = false)
-    private BigDecimal  height;
-    public BigDecimal volume(){
+    private BigDecimal height;
+
+    public BigDecimal volume() {
         return length
                 .multiply(width)
                 .multiply(height);

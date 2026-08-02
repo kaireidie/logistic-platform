@@ -8,7 +8,8 @@
 
 Backend logistics platform built with **Java 21**, **Spring Boot** and **PostgreSQL**.
 
-The goal of this project is to create a scalable warehouse and order management system while following modern backend development practices.
+The goal of this project is to create a scalable warehouse and order management system while following modern backend
+development practices.
 
 ---
 
@@ -27,16 +28,16 @@ The goal of this project is to create a scalable warehouse and order management 
 
 # Tech Stack
 
-| Technology | Version |
-|------------|---------|
-| Java | 21 |
-| Spring Boot | 4.1 |
-| Spring Data JPA | Latest |
-| Hibernate | 7 |
-| PostgreSQL | 17 |
-| Flyway | Latest |
-| Gradle | 9.6 |
-| Lombok | Latest |
+| Technology      | Version |
+|-----------------|---------|
+| Java            | 21      |
+| Spring Boot     | 4.1     |
+| Spring Data JPA | Latest  |
+| Hibernate       | 7       |
+| PostgreSQL      | 17      |
+| Flyway          | Latest  |
+| Gradle          | 9.6     |
+| Lombok          | Latest  |
 
 ---
 
@@ -49,10 +50,13 @@ src
 │   │   └── org.example.logisticplatform
 │   │       ├── config
 │   │       └── product
+│   │       └── ProductController
+│   │       └── productService
 │   └── resources
 │       ├── application.yaml
 │       └── db
 │           └── migration
+│               └── V1__create_products.sql
 └── test
 ```
 
@@ -60,12 +64,13 @@ src
 
 # API
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/products` | Get all products |
-| GET | `/api/products/{id}` | Get product by ID |
-| POST | `/api/products` | Create a new product |
-| DELETE | `/api/products/{id}` | Delete a product |
+| Method | Endpoint             | Description          |
+|--------|----------------------|----------------------|
+| GET    | `/api/products`      | Get all products     |
+| GET    | `/api/products/{id}` | Get product by ID    |
+| POST   | `/api/products`      | Create a new product |
+| PUT    | `/api/products/{id}` | Update a product     |
+| DELETE | `/api/products/{id}` | Delete a product     |
 
 ---
 
@@ -77,13 +82,14 @@ src
 - [x] Add Product repository
 - [x] Implement Product REST API
 - [x] Enable JPA Auditing
+- [x] Update endpoint (`PUT`)
 
 ### Next
 
 - [ ] Add ProductService
 - [ ] Introduce DTOs
 - [ ] Request validation
-- [ ] Update endpoint (`PUT`)
+- [ ] Update endpoint (`PATCH`)
 - [ ] Global exception handling
 - [ ] Category entity
 - [ ] Supplier entity
@@ -113,11 +119,11 @@ cd logistic-platform
 
 ## Configure environment variables
 
-| Variable | Description |
-|----------|-------------|
-| `DB_URL` | PostgreSQL JDBC URL |
-| `DB_USERNAME` | Database username |
-| `DB_PASSWORD` | Database password |
+| Variable      | Description         |
+|---------------|---------------------|
+| `DB_URL`      | PostgreSQL JDBC URL |
+| `DB_USERNAME` | Database username   |
+| `DB_PASSWORD` | Database password   |
 
 Example:
 
@@ -165,8 +171,8 @@ src/main/resources/db/migration
 
 Common problems and solutions.
 
-| Problem | Cause | Solution |
-|----------|-------|----------|
+| Problem                                                                 | Cause                                                                 | Solution                                                                                                   |
+|-------------------------------------------------------------------------|-----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
 | Spring Boot application fails to start due to PostgreSQL timezone error | System timezone uses an unsupported or deprecated timezone identifier | Set the timezone to a valid IANA timezone identifier, for example `UTC`, `Europe/London`, or `Europe/Kyiv` |
 
 Example error:
@@ -176,7 +182,9 @@ SQL State  : 22023
 Error Code : 0
 Message    : FATAL: invalid value for parameter "TimeZone": "Europe/Kiev"
 ```
+
 ---
+
 # HTTP Requests
 
 Example requests are stored in the `http/` directory and can be executed directly from IntelliJ IDEA Ultimate.

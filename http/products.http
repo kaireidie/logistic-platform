@@ -30,3 +30,24 @@ Content-Type: application/json
 
 ### Удалить товар
 DELETE http://localhost:8080/api/products/1
+
+###
+
+
+### Обновить товар
+PUT http://localhost:8080/api/products/1
+Content-Type: application/json
+
+{
+  "name": "PlayStation 5 Pro",
+  "description": "Gaming Console",
+  "photoUrl": "https://example.com/ps5pro.jpg",
+  "price": 9991.99,
+  "dimensions": {
+    "length": 30.7,
+    "width": 14.1,
+    "height": 2.8
+  },
+  "categoryId": 1,
+  "supplierId": 2
+}
