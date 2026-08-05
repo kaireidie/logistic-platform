@@ -1,18 +1,15 @@
-# ---------- Stage 1: Build ----------
-FROM gradle:9.1.0-jdk21 AS builder
-
-WORKDIR /app
-
-COPY . .
-
-RUN gradle bootJar --no-daemon
-
-# ---------- Stage 2: Runtime ----------
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY --from=builder /app/build/libs/*.jar app.jar
+RUN groupadd spring && useradd spring -g spring
+
+# Забираем jar-файл из локальной папки сборки Gradle
+COPY build/libs/*.jar app.jar
+
+RUN chown spring:spring app.jar
+
+USER spring
 
 EXPOSE 8080
 

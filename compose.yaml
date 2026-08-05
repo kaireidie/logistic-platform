@@ -14,11 +14,11 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
-  #    healthcheck:
-  #      test: ["CMD-SHELL", "pg_isready -U postgres -d logistic"]
-  #      interval: 10s
-  #      timeout: 5s
-  #      retries: 5
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d logistic" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   app:
     build:
@@ -28,7 +28,8 @@ services:
     container_name: logistic-app
 
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
     ports:
       - "8080:8080"
