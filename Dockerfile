@@ -1,16 +1,18 @@
-FROM eclipse-temurin:21-jre
+FROM gradle:8.5-jdk21 AS builder
+WORKDIR /app
+COPY . .
 
+RUN chmod +x gradlew
+
+RUN ./gradlew bootJar -x test
+
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-RUN groupadd spring && useradd spring -g spring
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
 
-# Забираем jar-файл из локальной папки сборки Gradle
-COPY build/libs/*.jar app.jar
-
-RUN chown spring:spring app.jar
-
-USER spring
+COPY --from=builder /app/build/libs/*.jar app.jar
 
 EXPOSE 8080
-
 ENTRYPOINT ["java", "-jar", "app.jar"]
