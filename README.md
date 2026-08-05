@@ -1,69 +1,71 @@
 # Logistic Platform
 
 ![Java](https://img.shields.io/badge/Java-21-orange)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1-brightgreen)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3-brightgreen)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-1.30-326CE5?logo=kubernetes&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue)
 ![Gradle](https://img.shields.io/badge/Gradle-9.6-02303A?logo=gradle&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-28.5-2496ED?logo=docker&logoColor=white)
-![Docker Compose](https://img.shields.io/badge/Docker_Compose-v2-2496ED?logo=docker&logoColor=white)
 ![License](https://img.shields.io/badge/License-BSD_2--Clause-blue.svg)
 
-Backend logistics platform built with **Java 21**, **Spring Boot** and **PostgreSQL**.
+Backend logistics platform built with **Java 21**, **Spring Boot**, **Kubernetes** and **PostgreSQL**.
 
 The goal of this project is to create a scalable warehouse and order management system while following modern backend
-development practices.
+development and DevOps practices.
 
 ---
 
 # Features
 
 - ✅ REST API for product management
+- ✅ Kubernetes deployment with NGINX Ingress Controller
+- ✅ Automated one-click deployment script (`deploy.sh` / `deploy.ps1`)
+- ✅ Health monitoring via Spring Boot Actuator
 - ✅ PostgreSQL integration
 - ✅ Flyway database migrations
-- ✅ Spring Data JPA
-- ✅ JPA Auditing (`createdAt`)
+- ✅ Spring Data JPA & JPA Auditing (`createdAt`)
 - ✅ Embedded value objects (`Dimensions`)
 - ✅ Environment-based configuration
 - ✅ Gradle Kotlin DSL
-- ✅ Docker support
-- ✅ Docker Compose
+- ✅ Containerization via Docker & Docker Compose
 
 ---
 
 # Tech Stack
 
-| Technology      | Version |
-|-----------------|---------|
-| Java            | 21      |
-| Spring Boot     | 4.1     |
-| Spring Data JPA | Latest  |
-| Hibernate       | 7       |
-| PostgreSQL      | 17      |
-| Flyway          | Latest  |
-| Docker          | Latest  |
-| Docker Compose  | Latest  |
-| Gradle          | 9.6     |
-| Lombok          | Latest  |
+| Technology               | Version |
+|--------------------------|---------|
+| Java                     | 21      |
+| Spring Boot              | 3.x     |
+| Spring Data JPA          | Latest  |
+| Hibernate                | 6 / 7   |
+| PostgreSQL               | 17      |
+| Flyway                   | Latest  |
+| Kubernetes (Kind)        | 1.30+   |
+| NGINX Ingress Controller | Latest  |
+| Docker & Docker Compose  | Latest  |
+| Gradle (Kotlin DSL)      | 9.6     |
+| Lombok                   | Latest  |
 
 ---
 
 # Project Structure
 
 ```text
-src
-├── main
-│   ├── java
-│   │   └── org.example.logisticplatform
-│   │       ├── config
-│   │       └── product
-│   │       └── ProductController
-│   │       └── productService
-│   └── resources
-│       ├── application.yaml
-│       └── db
-│           └── migration
-│               └── V1__create_products.sql
-└── test
+├── k8s/                        # Kubernetes manifests (Deployments, Services, Ingress)
+│   └── app/
+├── src/
+│   ├── main/
+│   │   ├── java/org/example/logisticplatform/
+│   │   │   ├── config/
+│   │   │   └── product/
+│   │   └── resources/
+│   │       ├── application.yaml
+│   │       └── db/migration/   # Flyway SQL migrations
+│   └── test/
+├── deploy.sh                   # One-click Bash deploy script (Linux / macOS / Git Bash)
+├── docker-compose.yaml
+└── build.gradle.kts
 ```
 
 ---
@@ -91,10 +93,12 @@ src
 - [x] Update endpoint (`PUT`)
 - [x] Docker support
 - [x] Docker Compose
+- [x] Kubernetes cluster setup & Ingress routing
+- [x] Spring Boot Actuator monitoring
+- [x] One-click deployment scripts (deploy.sh)
 
 ### Next
 
-- [ ] Kubernetes
 - [ ] Add ProductService
 - [ ] Introduce DTOs
 - [ ] Request validation
@@ -120,16 +124,32 @@ src
 - Docker Desktop
 - Docker Compose
 
-## Clone repository
+## 🚀 One-Click Deployment (Kubernetes - Recommended)
 
-```bash
-git clone https://gitlab.com/<username>/logistic-platform.git
-cd logistic-platform
-```
+1. **Clone the repository:**
 
-## Start the application
+   ```bash
+   git clone https://github.com/kaireidie/logistic-platform
+   cd logistic-platform
+    ```
+2. **Run the automated deployment script:**
 
-Build and start all services:
+   Linux / macOS / Git Bash:
+   ```bash
+   chmod +x deploy.sh
+   ./deploy.sh
+   ```
+   The script automatically creates the required namespace, installs the NGINX Ingress Controller, waits for it to
+   become ready, and applies all Kubernetes manifests.
+
+
+3. **Verify access:**
+    * **API / Application:** `http://localhost`
+    * **Health Check:** `http://localhost/actuator/health`
+
+## 🐳 Docker Compose Alternative
+
+If you prefer to run services without Kubernetes:
 
 ```bash
 docker compose up --build
@@ -186,6 +206,7 @@ Common problems and solutions.
 | Problem                                                                 | Cause                                                                 | Solution                                                                                                   |
 |-------------------------------------------------------------------------|-----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
 | Spring Boot application fails to start due to PostgreSQL timezone error | System timezone uses an unsupported or deprecated timezone identifier | Set the timezone to a valid IANA timezone identifier, for example `UTC`, `Europe/London`, or `Europe/Kyiv` |
+| \r: command not found when running deploy.sh                            | Windows CRLF line endings in Bash script                              | Change line endings of deploy.sh to LF in your IDE(etc.) or use .gitattributes                             |
 
 Example error:
 
@@ -203,24 +224,36 @@ Example requests are stored in the `http/` directory and can be executed directl
 
 ---
 
-# Docker Architecture
+# Kubernetes Architecture
 
 The application consists of two containers:
 
 ```text
-┌────────────────────┐
-│ logistic-app       │
-│ Spring Boot        │
-└─────────┬──────────┘
-          │
-          │
-┌─────────▼──────────┐
-│ logistic-postgres  │
-│ PostgreSQL 17      │
-└────────────────────┘
+[ Client Request ]
+                                  │
+                                  ▼
+                   ┌──────────────────────────────┐
+                   │   NGINX Ingress Controller   │
+                   │    (http://localhost:80)     │
+                   └──────────────┬───────────────┘
+                                  │
+                                  ▼
+                   ┌──────────────────────────────┐
+                   │    logistic-app Service      │
+                   └──────────────┬───────────────┘
+                                  │
+                                  ▼
+                   ┌──────────────────────────────┐
+                   │   logistic-platform Pod      │
+                   │     (Spring Boot App)        │
+                   └──────────────┬───────────────┘
+                                  │
+                                  ▼
+                   ┌──────────────────────────────┐
+                   │    logistic-postgres Pod     │
+                   │       (PostgreSQL 17)        │
+                   └──────────────────────────────┘
 ```
-
-Both containers are orchestrated using **Docker Compose**.
 
 # Changelog
 
