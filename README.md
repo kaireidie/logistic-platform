@@ -3,7 +3,9 @@
 ![Java](https://img.shields.io/badge/Java-21-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue)
-![Gradle](https://img.shields.io/badge/Gradle-9.6-02303A)
+![Gradle](https://img.shields.io/badge/Gradle-9.6-02303A?logo=gradle&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-28.5-2496ED?logo=docker&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker_Compose-v2-2496ED?logo=docker&logoColor=white)
 ![License](https://img.shields.io/badge/License-BSD_2--Clause-blue.svg)
 
 Backend logistics platform built with **Java 21**, **Spring Boot** and **PostgreSQL**.
@@ -23,6 +25,8 @@ development practices.
 - ✅ Embedded value objects (`Dimensions`)
 - ✅ Environment-based configuration
 - ✅ Gradle Kotlin DSL
+- ✅ Docker support
+- ✅ Docker Compose
 
 ---
 
@@ -36,6 +40,8 @@ development practices.
 | Hibernate       | 7       |
 | PostgreSQL      | 17      |
 | Flyway          | Latest  |
+| Docker          | Latest  |
+| Docker Compose  | Latest  |
 | Gradle          | 9.6     |
 | Lombok          | Latest  |
 
@@ -83,9 +89,12 @@ src
 - [x] Implement Product REST API
 - [x] Enable JPA Auditing
 - [x] Update endpoint (`PUT`)
+- [x] Docker support
+- [x] Docker Compose
 
 ### Next
 
+- [ ] Kubernetes
 - [ ] Add ProductService
 - [ ] Introduce DTOs
 - [ ] Request validation
@@ -97,7 +106,6 @@ src
 - [ ] Inventory management
 - [ ] Order management
 - [ ] Authentication & Authorization
-- [ ] Docker support
 - [ ] Unit & Integration tests
 
 ---
@@ -109,6 +117,8 @@ src
 - Java 21
 - PostgreSQL 17+
 - Gradle (or use the Gradle Wrapper)
+- Docker Desktop
+- Docker Compose
 
 ## Clone repository
 
@@ -117,34 +127,34 @@ git clone https://gitlab.com/<username>/logistic-platform.git
 cd logistic-platform
 ```
 
-## Configure environment variables
+## Start the application
 
-| Variable      | Description         |
-|---------------|---------------------|
-| `DB_URL`      | PostgreSQL JDBC URL |
-| `DB_USERNAME` | Database username   |
-| `DB_PASSWORD` | Database password   |
-
-Example:
-
-```text
-DB_URL=jdbc:postgresql://localhost:5432/logisticsystem
-DB_USERNAME=admin
-DB_PASSWORD=admin
-```
-
-## Run the application
-
-Using Gradle Wrapper:
+Build and start all services:
 
 ```bash
-./gradlew bootRun
+docker compose up --build
 ```
 
-Windows:
+Run in background:
 
-```powershell
-.\gradlew.bat bootRun
+```bash
+docker compose up -d
+```
+
+Stop all services:
+
+```bash
+docker compose down
+```
+
+PostgreSQL:
+
+```text
+Host: localhost
+Port: 5432
+Database: logistic
+Username: postgres
+Password: postgres
 ```
 
 The application will be available at:
@@ -157,9 +167,11 @@ http://localhost:8080
 
 # Database
 
-Database schema is managed using **Flyway**.
+The application uses **PostgreSQL 17** running inside a Docker container.
 
-Migrations are located in:
+Database schema is managed automatically by **Flyway** during application startup.
+
+Migration scripts are located in:
 
 ```text
 src/main/resources/db/migration
@@ -190,6 +202,25 @@ Message    : FATAL: invalid value for parameter "TimeZone": "Europe/Kiev"
 Example requests are stored in the `http/` directory and can be executed directly from IntelliJ IDEA Ultimate.
 
 ---
+
+# Docker Architecture
+
+The application consists of two containers:
+
+```text
+┌────────────────────┐
+│ logistic-app       │
+│ Spring Boot        │
+└─────────┬──────────┘
+          │
+          │
+┌─────────▼──────────┐
+│ logistic-postgres  │
+│ PostgreSQL 17      │
+└────────────────────┘
+```
+
+Both containers are orchestrated using **Docker Compose**.
 
 # Changelog
 
