@@ -1,5 +1,31 @@
 stages:
+  - test
   - build
+
+variables:
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+
+cache:
+  paths:
+    - .gradle/caches
+    - .gradle/wrapper
+
+gradle-test:
+  stage: test
+  image: eclipse-temurin:21-jdk
+  services:
+    - name: postgres:17-alpine
+      alias: postgres
+  variables:
+    POSTGRES_DB: test_db
+    POSTGRES_USER: test_user
+    POSTGRES_PASSWORD: test_password
+    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/test_db
+    SPRING_DATASOURCE_USERNAME: test_user
+    SPRING_DATASOURCE_PASSWORD: test_password
+  script:
+    - chmod +x gradlew
+    - ./gradlew test
 
 build_and_push:
   stage: build
