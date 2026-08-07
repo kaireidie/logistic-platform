@@ -54,6 +54,7 @@ development and DevOps practices.
 ```text
 ├── k8s/                        # Kubernetes manifests (Deployments, Services, Ingress)
 │   └── app/
+│   └── postgres/
 ├── src/
 │   ├── main/
 │   │   ├── java/org/example/logisticplatform/
@@ -72,14 +73,14 @@ development and DevOps practices.
 
 # API
 
-| Method | Endpoint             | Description          |
-|--------|----------------------|----------------------|
-| GET    | `/api/products`      | Get all products     |
-| GET    | `/api/products/{id}` | Get product by ID    |
-| POST   | `/api/products`      | Create a new product |
-| PUT    | `/api/products/{id}` | Update a product     |
+| Method | Endpoint             | Description                |
+|--------|----------------------|----------------------------|
+| GET    | `/api/products`      | Get all products           |
+| GET    | `/api/products/{id}` | Get product by ID          |
+| POST   | `/api/products`      | Create a new product       |
+| PUT    | `/api/products/{id}` | Update a product           |
 | PATCH  | `/api/products/{id}` | Partially update a product |
-| DELETE | `/api/products/{id}` | Delete a product     |
+| DELETE | `/api/products/{id}` | Delete a product           |
 
 ---
 
@@ -147,6 +148,84 @@ development and DevOps practices.
     * **API / Application:** `http://localhost`
     * **Health Check:** `http://localhost/actuator/health`
 
+## 📦 Kubernetes (Kind Alternative)
+
+#### If you prefer to deploy the application manually, follow the steps below:
+
+First create kind-config.yaml on k8s folder
+(k8s/kind-config.yaml)
+
+```bash
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+
+name: logistic-platform
+
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
+```
+
+Create cluster
+
+1. ```bash
+   kind create cluster --name logistic-platform --config k8s/kind-config.yaml
+   ```
+
+### ### Optional: rebuild Docker image manually 2-4
+
+Build docker container
+
+2. ```bash
+   docker build -t logistic-platform:latest .
+   ```
+
+Load docker container to k8s
+
+3. ```bash
+   kind load docker-image logistic-platform:latest --name logistic-platform
+   ```
+
+Create namespaces
+
+4. ```bash
+   kubectl create namespace logistic-platform
+   ```
+
+(Optional) Add NGINX Ingress
+
+5. ```bash
+   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+   ```
+
+(Optional) Apply NGINX Ingress
+
+6. ```bash
+   kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
+   ```
+
+Apply manifests
+
+7. ```bash
+   kubectl apply -f k8s/namespace.yaml &&                                                                
+   kubectl apply -f k8s/secret.yaml -n logistic-platform &&                                              
+   kubectl apply -f k8s/configmap.yaml -n logistic-platform &&                                           
+   kubectl apply -f k8s/postgres/service.yaml -n logistic-platform &&                                    
+   kubectl apply -f k8s/postgres/statefulset.yaml -n logistic-platform &&                                
+   kubectl wait --for=condition=ready pod -l app=postgres -n logistic-platform --timeout=180s &&         
+   kubectl apply -f k8s/app/service.yaml -n logistic-platform &&                                         
+   kubectl apply -f k8s/app/deployment.yaml -n logistic-platform &&                                      
+   kubectl wait --for=condition=available deployment/logistic-platform -n logistic-platform --timeout=120s &&                                                                                     
+   kubectl apply -f k8s/app/ingress.yaml -n logistic-platform &&                                         
+   kubectl get pods,svc,ingress -n logistic-platform
+   ```
+
 ## 🐳 Docker Compose Alternative
 
 If you prefer to run services without Kubernetes:
@@ -207,6 +286,7 @@ Common problems and solutions.
 |-------------------------------------------------------------------------|-----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
 | Spring Boot application fails to start due to PostgreSQL timezone error | System timezone uses an unsupported or deprecated timezone identifier | Set the timezone to a valid IANA timezone identifier, for example `UTC`, `Europe/London`, or `Europe/Kyiv` |
 | \r: command not found when running deploy.sh                            | Windows CRLF line endings in Bash script                              | Change line endings of deploy.sh to LF in your IDE(etc.) or use .gitattributes                             |
+| 504 NGINX                                                               | Spring Boot starts before PostgreSQL                                  | Wait for the pods to restart (~1 min)                                                                      |
 
 Example error:
 

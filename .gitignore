@@ -38,7 +38,12 @@ out/
 
 ### kind kubernetes
 kind.exe
+
 ### secrets
 secrets.yaml
+
 ### kubeseal
 kubeseal.exe
+
+### k8s/kind-config.yaml
+k8s/kind-config.yaml

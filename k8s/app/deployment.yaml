@@ -18,8 +18,8 @@ spec:
     spec:
       containers:
         - name: logistic-platform
-          image: logistic-platform:latest
-          imagePullPolicy: IfNotPresent
+          image: ghcr.io/kaireidie/logistic-platform:latest
+          imagePullPolicy: Always
 
           ports:
             - containerPort: 8080
