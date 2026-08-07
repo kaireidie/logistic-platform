@@ -49,22 +49,35 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-//
-//    @PatchMapping("/{id}")
-//    public ResponseEntity<Void> patch(@PathVariable Long id, @RequestBody Product patchProduct) {
-// Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
-//
-//        product.setName(patchProduct.getName());
-//        product.setDescription(patchProduct.getDescription());
-//        product.setDimensions(patchProduct.getDimensions());
-//        product.setPrice(patchProduct.getPrice());
-//        product.setCategoryId(patchProduct.getCategoryId());
-//        product.setPhotoUrl(patchProduct.getPhotoUrl());
-//        product.setSupplierId(patchProduct.getSupplierId());
-//        productRepository.save(product);
-//       return ResponseEntity.noContent().build();
-//    }
-//
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody Product patchProduct) {
+        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+        if (patchProduct.getName() != null) {
+            product.setName(patchProduct.getName());
+        }
+        if (patchProduct.getDescription() != null) {
+            product.setDescription(patchProduct.getDescription());
+        }
+        if (patchProduct.getDimensions() != null) {
+            product.setDimensions(patchProduct.getDimensions());
+        }
+        if (patchProduct.getPrice() != null) {
+            product.setPrice(patchProduct.getPrice());
+        }
+        if (patchProduct.getCategoryId() != null) {
+            product.setCategoryId(patchProduct.getCategoryId());
+        }
+        if (patchProduct.getPhotoUrl() != null) {
+            product.setPhotoUrl(patchProduct.getPhotoUrl());
+        }
+        if (patchProduct.getSupplierId() != null) {
+            product.setSupplierId(patchProduct.getSupplierId());
+        }
+        productRepository.save(product);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
 

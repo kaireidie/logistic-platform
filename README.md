@@ -19,7 +19,7 @@ development and DevOps practices.
 
 - ✅ REST API for product management
 - ✅ Kubernetes deployment with NGINX Ingress Controller
-- ✅ Automated one-click deployment script (`deploy.sh` / `deploy.ps1`)
+- ✅ Automated one-click deployment script (`deploy.sh`)
 - ✅ Health monitoring via Spring Boot Actuator
 - ✅ PostgreSQL integration
 - ✅ Flyway database migrations
@@ -78,6 +78,7 @@ development and DevOps practices.
 | GET    | `/api/products/{id}` | Get product by ID    |
 | POST   | `/api/products`      | Create a new product |
 | PUT    | `/api/products/{id}` | Update a product     |
+| PATCH  | `/api/products/{id}` | Partially update a product |
 | DELETE | `/api/products/{id}` | Delete a product     |
 
 ---
@@ -102,7 +103,6 @@ development and DevOps practices.
 - [ ] Add ProductService
 - [ ] Introduce DTOs
 - [ ] Request validation
-- [ ] Update endpoint (`PATCH`)
 - [ ] Global exception handling
 - [ ] Category entity
 - [ ] Supplier entity

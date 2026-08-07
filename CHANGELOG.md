@@ -17,7 +17,7 @@
 * Configured JPA Auditing for automatic creation timestamps.
 * Added HTTP requests for API testing.
 * Implemented the PUT endpoint for updating products.
-* Started implementing the PATCH endpoint for partial product updates.
+* Implemented the PATCH endpoint for partial product updates.
 * Added Docker support for containerized application deployment.
 * Added Docker Compose configuration for running the application and PostgreSQL with a single command.
 

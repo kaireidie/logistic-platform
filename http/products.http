@@ -51,3 +51,15 @@ Content-Type: application/json
   "categoryId": 1,
   "supplierId": 2
 }
+
+###
+
+### Обновить переменную в товаре
+PATCH http://localhost/api/products/1
+Content-Type: application/json
+
+{
+  "description": "Gaming Console updated witch patch"
+}
+
+###
