@@ -8,8 +8,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
 
-    ports:
-      - "5432:5432"
+    #    ports:
+    #      - "5432:5432"
 
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -38,6 +38,19 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/logistic
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    container_name: logistic-frontend
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      - app
 
 volumes:
   postgres-data:
