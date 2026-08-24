@@ -1,9 +1,9 @@
 plugins {
     java
 
-    kotlin("jvm") version "2.3.21"
+    kotlin("jvm") version "2.4.10"
 
-    id("org.springframework.boot") version "4.1.0"
+    id("org.springframework.boot") version "4.1.1"
     id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -15,10 +15,6 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -34,8 +30,11 @@ dependencies {
     // Lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    
+
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+    // Kafka
+    implementation("org.springframework.kafka:spring-kafka")
 
     // Testing & Kotlin
     implementation(kotlin("stdlib-jdk8"))
