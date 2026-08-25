@@ -143,13 +143,29 @@ jobs:
         run: docker compose up --build --detach --wait --wait-timeout 180
 
       - name: Check application health
-        run: >-
-          curl
-          --fail
-          --retry 10
-          --retry-connrefused
-          --max-time 10
-          http://localhost:8080/actuator/health
+        run: |
+          echo "Waiting for application..."
+
+          for i in {1..30}; do
+            echo "Attempt $i/30"
+
+            if curl \
+              --fail \
+              --silent \
+              --show-error \
+              --max-time 10 \
+              http://localhost:8080/actuator/health; then
+              echo
+              echo "Application is healthy!"
+              exit 0
+            fi
+
+            echo "Application is not ready yet..."
+            sleep 5
+          done
+
+          echo "Application failed to become healthy."
+          exit 1
 
       - name: Show container logs
         if: failure()
