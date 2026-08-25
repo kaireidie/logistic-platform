@@ -19,9 +19,7 @@ cache:
   key:
     files:
       - gradle/wrapper/gradle-wrapper.properties
-      - build.gradle.kts
       - settings.gradle.kts
-      - android/app/build.gradle.kts
   paths:
     - .gradle/caches/
     - .gradle/wrapper/
