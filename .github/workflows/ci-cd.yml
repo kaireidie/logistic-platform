@@ -101,8 +101,8 @@ jobs:
           api-level: 34
           target: google_apis
           arch: x86_64
-          profile: pixel_5
-          emulator-options: -no-window -no-boot-anim -no-audio -no-snapshot
+          profile: pixel_2
+          emulator-options: -no-window -no-boot-anim -no-audio -no-snapshot -gpu swiftshader_indirect
           disable-animations: true
           script: ./gradlew :android:app:connectedDebugAndroidTest --no-daemon
 
