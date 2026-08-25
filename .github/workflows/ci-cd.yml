@@ -84,6 +84,18 @@ jobs:
           packages: "platforms;android-36 build-tools;36.0.0"
           log-accepted-android-sdk-licenses: "false"
 
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Check KVM
+        run: |
+          ls -l /dev/kvm
+          groups
+          test -r /dev/kvm && test -w /dev/kvm
+
       - name: Make Gradle executable
         run: chmod +x gradlew
 
@@ -104,6 +116,7 @@ jobs:
           profile: pixel_2
           emulator-options: -no-window -no-boot-anim -no-audio -no-snapshot -gpu swiftshader_indirect -no-metrics
           disable-animations: true
+          disable-linux-hw-accel: false
           script: ./gradlew :android:app:connectedDebugAndroidTest --no-daemon
 
       - name: Upload Android reports and APK
@@ -113,7 +126,7 @@ jobs:
           name: android-test-results
           path: |
             android/app/build/reports/
-            android/app/build/outputs/apk/debug/
+            android/app/build/outputs/android/apk/debug/
 
   container-smoke-test:
     name: Container smoke test
