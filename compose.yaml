@@ -44,6 +44,9 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
 
+    environment:
+      BFF_BACKEND_URL: http://app:8080
+
     container_name: logistic-frontend
 
     ports:
