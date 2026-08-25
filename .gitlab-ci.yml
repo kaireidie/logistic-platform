@@ -1,19 +1,39 @@
 stages:
   - test
   - smoke-test
-  - build
+  - publish
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
 
 variables:
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
 
-cache:
-  paths:
-    - .gradle/caches
-    - .gradle/wrapper
+default:
+  interruptible: true
 
-gradle-test:
+cache:
+  key:
+    files:
+      - gradle/wrapper/gradle-wrapper.properties
+      - build.gradle.kts
+      - settings.gradle.kts
+      - android/app/build.gradle.kts
+  paths:
+    - .gradle/caches/
+    - .gradle/wrapper/
+
+.gradle-job:
+  image: ghcr.io/cirruslabs/android-sdk:36@sha256:f9b3ea9ed2b5fc9522adae82c7b4622ab7aa54207ef532c8e615a347dca08f31
+  before_script:
+    - chmod +x gradlew
+
+backend-test:
+  extends: .gradle-job
   stage: test
-  image: eclipse-temurin:21-jdk
   services:
     - name: postgres:17-alpine
       alias: postgres
@@ -25,34 +45,62 @@ gradle-test:
     SPRING_DATASOURCE_USERNAME: test_user
     SPRING_DATASOURCE_PASSWORD: test_password
   script:
-    - chmod +x gradlew
-    - ./gradlew test
+    - ./gradlew :test --no-daemon
+  artifacts:
+    when: always
+    reports:
+      junit: build/test-results/test/*.xml
+    paths:
+      - build/reports/tests/test/
 
-build_and_push:
-  stage: build
-  image: docker:24.0.5
-  services:
-    - docker:24.0.5-dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
+android-test:
+  extends: .gradle-job
+  stage: test
   script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE:latest .
-    - docker push $CI_REGISTRY_IMAGE:latest
+    - ./gradlew :android:app:lintDebug :android:app:testDebugUnitTest :android:app:assembleDebug --no-daemon
+  artifacts:
+    when: always
+    reports:
+      junit: android/app/build/test-results/testDebugUnitTest/*.xml
+    paths:
+      - android/app/build/reports/lint-results-debug.html
+      - android/app/build/reports/tests/testDebugUnitTest/
+      - android/app/build/outputs/apk/debug/
 
 container-smoke-test:
   stage: smoke-test
-  image: docker:24.0.5
+  image: docker:27.5.1-cli
   services:
-    - docker:24.0.5-dind
+    - name: docker:27.5.1-dind
+      alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   script:
     - apk add --no-cache curl
-    - docker compose up -d --build
-    - sleep 45
-    - curl --fail http://docker:8080/actuator/health
+    - docker compose up --build --detach --wait --wait-timeout 180
+    - curl --fail --retry 10 --retry-connrefused http://docker:8080/actuator/health
   after_script:
-    - docker compose down
+    - docker compose logs --no-color || true
+    - docker compose down --volumes --remove-orphans || true
+
+build-and-push:
+  stage: publish
+  image: docker:27.5.1-cli
+  services:
+    - name: docker:27.5.1-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  needs:
+    - backend-test
+    - android-test
+    - container-smoke-test
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - echo "$CI_JOB_TOKEN" | docker login --username "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build --pull --tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" --tag "$CI_REGISTRY_IMAGE:latest" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE:latest"
