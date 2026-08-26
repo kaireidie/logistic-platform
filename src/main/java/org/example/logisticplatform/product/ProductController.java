@@ -1,18 +1,21 @@
 package org.example.logisticplatform.product;
 
+import org.example.logisticplatform.product.dto.ProductDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/v1/products")
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductRepository productRepository;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ProductRepository productRepository) {
         this.productService = productService;
+        this.productRepository = productRepository;
     }
 
     @GetMapping
@@ -26,8 +29,9 @@ public class ProductController {
     }
 
     @PostMapping
-    public Product create(@RequestBody Product product) {
-        return productService.create(product);
+    public Product create(@RequestBody ProductDto dto) {
+
+        return productService.create(dto);
     }
 
     @DeleteMapping("/{id}")
@@ -36,15 +40,17 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> put(@PathVariable Long id, @RequestBody Product updateProduct) {
-        return productService.put(id, updateProduct);
+    public ResponseEntity<Void> put(@PathVariable Long id, @RequestBody ProductDto dto) {
+        productService.put(id, dto);
+        return ResponseEntity.noContent().build();
     }
 
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody Product patchProduct) {
-        return productService.update(id, patchProduct);
+    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody ProductDto dto) {
+        productService.update(id, dto);
+        return ResponseEntity.noContent().build();
     }
-    
+
 }
 

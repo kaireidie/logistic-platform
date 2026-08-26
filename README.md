@@ -79,15 +79,15 @@ The Android client is intended to call the shared Spring Boot API directly. It s
 
 ## API
 
-| Method   | Endpoint             | Description                |
-|----------|----------------------|----------------------------|
-| `GET`    | `/api/products`      | Get all products           |
-| `GET`    | `/api/products/{id}` | Get product by ID          |
-| `POST`   | `/api/products`      | Create a product           |
-| `PUT`    | `/api/products/{id}` | Replace a product          |
-| `PATCH`  | `/api/products/{id}` | Partially update a product |
-| `DELETE` | `/api/products/{id}` | Delete a product           |
-| `GET`    | `/actuator/health`   | Spring Boot health check   |
+| Method   | Endpoint                | Description                |
+|----------|-------------------------|----------------------------|
+| `GET`    | `/api/v1/products`      | Get all products           |
+| `GET`    | `/api/v1/products/{id}` | Get product by ID          |
+| `POST`   | `/api/v1/products`      | Create a product           |
+| `PUT`    | `/api/v1/products/{id}` | Replace a product          |
+| `PATCH`  | `/api/v1/products/{id}` | Partially update a product |
+| `DELETE` | `/api/v1/products/{id}` | Delete a product           |
+| `GET`    | `/actuator/health`      | Spring Boot health check   |
 
 ## Run Locally
 

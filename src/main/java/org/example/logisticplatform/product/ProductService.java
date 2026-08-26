@@ -1,13 +1,13 @@
 package org.example.logisticplatform.product;
 
-import org.springframework.http.ResponseEntity;
+import org.example.logisticplatform.product.dto.ProductDto;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -20,76 +20,77 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public Product getById(@PathVariable Long id) {
+    public Product getById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
-    public Product create(@RequestBody Product product) {
+    @Transactional
+    public Product create(ProductDto dto) {
+        Product product = new Product();
+        product.setName(dto.name());
+        product.setDescription(dto.description());
+        product.setPhotoUrl(dto.photoUrl());
+        product.setPrice(dto.price());
+        product.setDimensions(dto.dimensions());
+        product.setCategoryId(dto.categoryId());
+        product.setSupplierId(dto.supplierId());
+
         return productRepository.save(product);
     }
 
-    public void delete(@PathVariable Long id) {
+    @Transactional
+    public void delete(Long id) {
         productRepository.deleteById(id);
     }
 
-    public ResponseEntity<Void> put(
-            @PathVariable Long id,
-            @RequestBody Product updateProduct
-    ) {
+    @Transactional
+    public void put(Long id, ProductDto dto) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        product.setName(updateProduct.getName());
-        product.setDescription(updateProduct.getDescription());
-        product.setDimensions(updateProduct.getDimensions());
-        product.setPrice(updateProduct.getPrice());
-        product.setCategoryId(updateProduct.getCategoryId());
-        product.setPhotoUrl(updateProduct.getPhotoUrl());
-        product.setSupplierId(updateProduct.getSupplierId());
+        product.setName(dto.name());
+        product.setDescription(dto.description());
+        product.setDimensions(dto.dimensions());
+        product.setPrice(dto.price());
+        product.setCategoryId(dto.categoryId());
+        product.setPhotoUrl(dto.photoUrl());
+        product.setSupplierId(dto.supplierId());
 
-        productRepository.save(product);
-
-        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<Void> update(
-            @PathVariable Long id,
-            @RequestBody Product patchProduct
-    ) {
+    @Transactional
+    public void update(Long id, ProductDto dto) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (patchProduct.getName() != null) {
-            product.setName(patchProduct.getName());
+        if (dto.name() != null) {
+            product.setName(dto.name());
         }
 
-        if (patchProduct.getDescription() != null) {
-            product.setDescription(patchProduct.getDescription());
+        if (dto.description() != null) {
+            product.setDescription(dto.description());
         }
 
-        if (patchProduct.getDimensions() != null) {
-            product.setDimensions(patchProduct.getDimensions());
+        if (dto.dimensions() != null) {
+            product.setDimensions(dto.dimensions());
         }
 
-        if (patchProduct.getPrice() != null) {
-            product.setPrice(patchProduct.getPrice());
+        if (dto.price() != null) {
+            product.setPrice(dto.price());
         }
 
-        if (patchProduct.getCategoryId() != null) {
-            product.setCategoryId(patchProduct.getCategoryId());
+        if (dto.categoryId() != null) {
+            product.setCategoryId(dto.categoryId());
         }
 
-        if (patchProduct.getPhotoUrl() != null) {
-            product.setPhotoUrl(patchProduct.getPhotoUrl());
+        if (dto.photoUrl() != null) {
+            product.setPhotoUrl(dto.photoUrl());
         }
 
-        if (patchProduct.getSupplierId() != null) {
-            product.setSupplierId(patchProduct.getSupplierId());
+        if (dto.supplierId() != null) {
+            product.setSupplierId(dto.supplierId());
         }
-
-        productRepository.save(product);
-
-        return ResponseEntity.noContent().build();
     }
+
 }

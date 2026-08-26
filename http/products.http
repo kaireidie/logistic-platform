@@ -1,15 +1,15 @@
 ### Получить все товары
-GET http://localhost/api/products
+GET http://localhost:8080/api/v1/products
 
 ###
 
 ### Получить товар по ID
-GET http://localhost/api/products/1
+GET http://localhost:8080/api/v1/products/1
 
 ###
 
 ### Создать товар
-POST http://localhost/api/products
+POST http://localhost:8080/api/v1/products
 Content-Type: application/json
 
 {
@@ -29,13 +29,13 @@ Content-Type: application/json
 ###
 
 ### Удалить товар
-DELETE http://localhost/api/products/1
+DELETE http://localhost:8080/api/v1/products/1
 
 ###
 
 
 ### Обновить товар
-PUT http://localhost/api/products/1
+PUT http://localhost:8080/api/v1/products/1
 Content-Type: application/json
 
 {
@@ -55,7 +55,7 @@ Content-Type: application/json
 ###
 
 ### Обновить переменную в товаре
-PATCH http://localhost/api/products/1
+PATCH http://localhost:8080/api/v1/products/1
 Content-Type: application/json
 
 {
