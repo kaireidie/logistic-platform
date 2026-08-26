@@ -5,6 +5,10 @@ plugins {
 
     id("org.springframework.boot") version "4.1.1"
     id("io.spring.dependency-management") version "1.1.7"
+
+    kotlin("plugin.lombok") version "2.4.10"
+    kotlin("plugin.spring") version "2.4.10"
+    kotlin("kapt")
 }
 
 group = "org.example"
@@ -32,6 +36,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
 
     // Kafka
     implementation("org.springframework.kafka:spring-kafka")
@@ -40,8 +45,12 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(kotlin("test"))
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+kapt {
+    keepJavacAnnotationProcessors = true
 }
