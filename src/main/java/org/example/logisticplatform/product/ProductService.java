@@ -1,6 +1,7 @@
 package org.example.logisticplatform.product;
 
-import org.example.logisticplatform.product.dto.ProductDto;
+import org.example.logisticplatform.product.dto.ProductRequestDto;
+import org.example.logisticplatform.product.dto.ProductResponseDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,56 +12,69 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
+        this.productMapper = productMapper;
     }
 
-    public List<Product> getAll() {
-        return productRepository.findAll();
+    public List<ProductResponseDto> getAll() {
+        return productRepository.findAll().stream()
+                .map(productMapper::toResponseDto).toList();
     }
 
-    public Product getById(Long id) {
-        return productRepository.findById(id)
+    public ProductResponseDto getById(Long id) {
+        return productRepository.findById(id).map(productMapper::toResponseDto)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
     @Transactional
-    public Product create(ProductDto dto) {
-        Product product = new Product();
-        product.setName(dto.name());
-        product.setDescription(dto.description());
-        product.setPhotoUrl(dto.photoUrl());
-        product.setPrice(dto.price());
-        product.setDimensions(dto.dimensions());
-        product.setCategoryId(dto.categoryId());
-        product.setSupplierId(dto.supplierId());
-
-        return productRepository.save(product);
+    public ProductResponseDto create(ProductRequestDto dto) {
+        Product product = productMapper.toEntity(dto);
+        Product savedProduct = productRepository.save(product);
+        return productMapper.toResponseDto(savedProduct);
     }
 
     @Transactional
-    public void delete(Long id) {
-        productRepository.deleteById(id);
+    public ProductResponseDto delete(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+        productRepository.delete(product);
+        return productMapper.toResponseDto(product);
     }
 
     @Transactional
-    public void put(Long id, ProductDto dto) {
+    public ProductResponseDto put(Long id, ProductRequestDto dto) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         product.setName(dto.name());
         product.setDescription(dto.description());
-        product.setDimensions(dto.dimensions());
         product.setPrice(dto.price());
         product.setCategoryId(dto.categoryId());
         product.setPhotoUrl(dto.photoUrl());
         product.setSupplierId(dto.supplierId());
 
+        if (dto.dimensions() != null) {
+            Dimensions dimensions = product.getDimensions();
+            if (dimensions == null) {
+                dimensions = new Dimensions();
+            }
+            dimensions.setLength(dto.dimensions().length());
+            dimensions.setWidth(dto.dimensions().width());
+            dimensions.setHeight(dto.dimensions().height());
+            product.setDimensions(dimensions);
+        } else {
+            product.setDimensions(null);
+        }
+
+        return productMapper.toResponseDto(product);
     }
 
     @Transactional
-    public void update(Long id, ProductDto dto) {
+    public ProductResponseDto update(Long id, ProductRequestDto dto) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
@@ -73,7 +87,14 @@ public class ProductService {
         }
 
         if (dto.dimensions() != null) {
-            product.setDimensions(dto.dimensions());
+            Dimensions dimensions = product.getDimensions();
+            if (dimensions == null) {
+                dimensions = new Dimensions();
+            }
+            dimensions.setLength(dto.dimensions().length());
+            dimensions.setWidth(dto.dimensions().width());
+            dimensions.setHeight(dto.dimensions().height());
+            product.setDimensions(dimensions);
         }
 
         if (dto.price() != null) {
@@ -91,6 +112,7 @@ public class ProductService {
         if (dto.supplierId() != null) {
             product.setSupplierId(dto.supplierId());
         }
+        return productMapper.toResponseDto(product);
     }
 
 }

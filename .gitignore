@@ -52,3 +52,5 @@ k8s/kind-config.yaml
 android/.gradle
 android/.idea
 local.properties
+
+DTO.md

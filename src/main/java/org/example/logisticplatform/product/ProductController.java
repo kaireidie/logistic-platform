@@ -1,6 +1,8 @@
 package org.example.logisticplatform.product;
 
-import org.example.logisticplatform.product.dto.ProductDto;
+import org.example.logisticplatform.product.dto.ProductRequestDto;
+import org.example.logisticplatform.product.dto.ProductResponseDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,37 +18,34 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Product> getAll() {
-        return productService.getAll();
+    public ResponseEntity<List<ProductResponseDto>> getAll() {
+        return ResponseEntity.ok(productService.getAll());
     }
 
     @GetMapping("/{id}")
-    public Product getById(@PathVariable Long id) {
-        return productService.getById(id);
+    public ResponseEntity<ProductResponseDto> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getById(id));
     }
 
     @PostMapping
-    public Product create(@RequestBody ProductDto dto) {
-
-        return productService.create(dto);
+    public ResponseEntity<ProductResponseDto> create(@RequestBody ProductRequestDto dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(dto));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        productService.delete(id);
+    public ResponseEntity<ProductResponseDto> delete(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.delete(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> put(@PathVariable Long id, @RequestBody ProductDto dto) {
-        productService.put(id, dto);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ProductResponseDto> put(@PathVariable Long id, @RequestBody ProductRequestDto dto) {
+        return ResponseEntity.ok(productService.put(id, dto));
     }
 
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody ProductDto dto) {
-        productService.update(id, dto);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ProductResponseDto> update(@PathVariable Long id, @RequestBody ProductRequestDto dto) {
+        return ResponseEntity.ok(productService.update(id, dto));
     }
 
 }
